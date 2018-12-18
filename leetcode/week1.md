@@ -1,7 +1,7 @@
 # 第一周LeetCode  #
 题目列表中类似题目会放在一起，每个题目先总结自己的思路想法以及代码，然后分析与标准答案和最优代码与自己代码差距
 ## 题目列表 ##
-题目带有leetcode链接（也为了好看）
+题目带有leetcode链接（少打字，带点颜色比较好看）
 
 1. Two Sum
 	1. [Two Sum II - Input array is sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)
