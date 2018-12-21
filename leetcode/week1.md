@@ -1,17 +1,16 @@
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 # 第一周LeetCode  #
-题目列表中类似题目会放在一起，每个题目先总结自己的思路想法以及代码，然后分析与标准答案和最优代码与自己代码差距
+题目列表中类似题目会放在一起，每个题目先总结自己的思路想法以及代码，然后分析与标准答案和最优代码与自己代码差距（在能看到官方silution的条件下），同时有看到更好的办法或者发现我代码有问题（基本不可能，所有代码都跑过的）欢迎给我留言：792869003@qq.com 
 ## 题目列表 ##
 题目带有leetcode链接（少打字，带点颜色比较好看），如果没有链接的就是需要付费的，后面集中处理
 
-1. Two Sum
+1. [Two Sum](https://leetcode.com/problems/two-sum/)
 	1. [Two Sum II - Input array is sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)
 	2. Two Sum III - Data structure design
 	3. [Two Sum IV - Input is a BST](https://leetcode.com/problems/two-sum-iv-input-is-a-bst/)
-	4. [3Sum](https://leetcode.com/problems/3sum/)
-	5. [4Sum](https://leetcode.com/problems/4sum/)
-	6. [Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
-2. 
+2. [3Sum](https://leetcode.com/problems/3sum/)
+3. [4Sum](https://leetcode.com/problems/4sum/)
+4. [Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
 ## 回顾思路 ##
 ### 题目目的 ###
 给出一串数字和一个目标数字，找到数字串中相加能得到目标数字的组合。我们可以获得以下信息
@@ -21,14 +20,20 @@
 - 不能重复使用
 - 两个相加（可以考虑多个相加，只要能不重复就行）
 ### 思路 ###
-- 考虑最简单的，只要能accept就行，这就是Two Sum（一定有解，两个数字相加)
+- 先看简单一点的，这就是Two Sum（一定有解，两个数字相加)
 	- 我的第一反应就是两次循环暴力无脑求解（能解决问题就行），可以看结果很慢(*>﹏<*) ，分析一波后发现没救了$O\left( n^{2}\right)$，换个思路---------[代码链接以及结果](#code1)      
-	- 用map直接可以找到对应的元素不用遍历，节约的时间就是暴力中第二次循环，时间复杂度：$O\left( n\right)$，然后发现贼快，还可以把map换成unordered_map，底层实现不同，不过LeetCode测试结果一样  ---------[代码链接以及结果](#code2)  
+	- 用map直接可以找到对应的元素不用遍历，节约的时间就是暴力中第二次循环，时间复杂度：$O\left( n\right)$，然后发现贼快，还可以把map换成unordered_map，这是因为底层实现不同（请参考MAP的实现原理），不过LeetCode测试结果一样  ---------[代码链接以及结果](#code2)  
 	- 在官方的solutions还有个更快的，在初始化map的时候就检查是否满足要求,然后代码也是最简单---------[代码链接以及结果](#code3)   
-- 考虑3个数字相加
-### 代码------------------------------同样的代码有时候时间是不一样的 ###
-####code1####
-<span id="code1">暴力法</span>
+- 如果输入数据排序后就变成了Two Sum II - Input array is sorted
+	- 我们可以直接用上面的任何一种，只是需要把下标换一下
+- Two Sum III - Data structure design找到了题目，可以直接用map、set这些做，就是add(n)添加数字,find(m)判断是否存在
+- Two Sum IV - Input is a BST高级了点，输入是一个二叉搜索树，然后判断是否存在两个数字相加等于目前值
+	- 想的是把二叉树遍历一次，所有值存数组就是之前的算法---------[代码链接以及结果](#code6)
+- 考虑3个数字相加,这就是3Sum（**有一点不同的是要找出所有的解而不是一个**）
+	- 第一反应暴力上次循环无脑，结果不用想肯定垃圾，结果超出想象居然超时了---------[代码链接以及结果](#code4)  
+	- 想了一下，这是3个数字求和为0，我们可以先排序（从小到大），依次选一个负数然后找出两个数与他的和为零，我们只需要遍历所有的负数，然后在通过双下标找到另外两个数。发现速度还行，暂时想不出更好的---------[代码链接以及结果](#code5)  
+### 代码 ###
+<span id="code1">2Sum 暴力法</span>
 
     class Solution {
             public:
@@ -48,8 +53,7 @@
             }
         };
 ![](https://i.imgur.com/Pn6a497.png)
-####code2####
-<span id="code2">hashmap-twopass</span>
+<span id="code2">2Sum hashmap-twopass</span>
 
      class Solution {
             public:
@@ -72,8 +76,8 @@
             }
         };  
 ![](https://i.imgur.com/3t2DdOD.png)
-####code3####
-<span id="code2">hashmap-onepass</span>
+
+<span id="code3">2Sum hashmap-onepass</span>  
 
       class Solution {
             public:
@@ -89,7 +93,32 @@
             }
         };
 ![](https://i.imgur.com/3t2DdOD.png)
-### 跑的最快的代码 ###
+<span id="code6">Two Sum IV - Input is a BST</span> 
+		
+	  class Solution {
+            public:
+     		bool findTarget(TreeNode* root, int k) {
+        		if(!root)
+           	 		return false;
+        		unordered_set<int> numset;
+        		return visitNode(root,k,numset);
+    		}
+    		bool visitNode(TreeNode* node,int target,unordered_set<int>& numset)
+    		{
+        		if(!node)
+           			return false;
+        		if(numset.find(target-node->val)!=numset.end())
+            		return true;
+        		numset.insert(node->val);
+        		if(visitNode(node->left,target,numset))
+           			return true;
+        		if(visitNode(node->right,target,numset))
+           			return true;
+        		return false;
+    		}
+		};
+![](https://i.imgur.com/ECVdL6l.png)
+### 2Sum跑的最快的代码 ###
     class Solution {
 		public:
     	vector<int> twoSum(vector<int>& nums, int target) {
@@ -106,5 +135,62 @@
         	}
     	}
 	};
-### 分析 ###
-感觉没区别，又拿去跑了一次时间是4ms，可能和他的测试用例有关。
+<span id="code4">3Sum 暴力法</span>  
+
+      class Solution {
+		public:
+		std::vector<std::vector<int>> threeSum(std::vector<int>& nums) {
+			std::set<std::vector<int >> resu1;
+			for (int i = 0; i < nums.size() - 2; i++)
+			{
+				for (int j = i + 1; j < nums.size() - 1; j++)
+				{
+					for (int k = j + 1; k < nums.size(); k++)
+					{
+						if ((nums[i] + nums[j] + nums[k]) == 0) {
+							std::vector<int > temp = { nums[i], nums[j], nums[k] };
+							std::sort(temp.begin(), temp.end());
+							resu1.insert(temp);
+						}
+					}
+				}
+			}
+			return {resu1.begin(),resu1.end()};
+		}
+	};
+![](https://i.imgur.com/DxnPxPh.png)
+
+<span id="code5">3Sum 只遍历负数</span>  
+    
+    std::vector<std::vector<int>> threeSum1(std::vector<int>& nums) {
+		std::set<std::vector<int >> resu;
+		std::sort(nums.begin(), nums.end());
+		if (nums.size() < 3 || nums[0] >= 0 || nums[nums.size() - 1] <= 0)
+			return {  };
+		for (int i = 0; i < nums.size(); i++)
+		{
+			if (nums[i] > 0)
+				break;
+			int start = i + 1;
+			int end = nums.size() - 1;
+			while (start < end) {
+				if ((nums[i] + nums[start] + nums[end]) == 0)
+				{
+					resu.insert({ nums[i] , nums[start] , nums[end] });
+					while (start < end&&nums[start] == nums[start + 1])
+						start++;
+					while (start < end&&nums[end] == nums[end - 1])
+						end--;
+					start++;
+					end--;
+				}
+				else if ((nums[i] + nums[start] + nums[end]) > 0)
+					end--;
+				else start++;
+			}
+		}
+		return std::vector<std::vector<int >>(resu.begin(), resu.end());
+	}
+![](https://i.imgur.com/vv1iwzR.png)
+### 分析Two Sum ###
+除了bst以外，都是通过hash表来获得最快的处理，而bst中我采用递归遍历，算法过程和普通的类似，但是最终的出来的时间会比先遍历所有节点，在来查找满足要求的慢，原因个人觉得是由于递归的栈处理时间导致。
