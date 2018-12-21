@@ -1,14 +1,17 @@
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+
 # 第一周LeetCode  #
 题目列表中类似题目会放在一起，每个题目先总结自己的思路想法以及代码，然后分析与标准答案和最优代码与自己代码差距（在能看到官方silution的条件下），同时有看到更好的办法或者发现我代码有问题（基本不可能，所有代码都跑过的）欢迎给我留言：792869003@qq.com 
 ## 题目列表 ##
-题目带有leetcode链接（少打字，带点颜色比较好看），如果没有链接的就是需要付费的，后面集中处理
+题目带有leetcode链接（少打字，带点颜色比较好看），如果没有链接的就是需要付费的，就只能自己找题目
 
 1. [Two Sum](https://leetcode.com/problems/two-sum/)
 	1. [Two Sum II - Input array is sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)
 	2. Two Sum III - Data structure design
 	3. [Two Sum IV - Input is a BST](https://leetcode.com/problems/two-sum-iv-input-is-a-bst/)
 2. [3Sum](https://leetcode.com/problems/3sum/)
+	1. [3Sum Closest](https://leetcode.com/problems/3sum-closest/)
+	2. [3Sum Smaller](https://leetcode.com/problems/3sum-smaller/)
 3. [4Sum](https://leetcode.com/problems/4sum/)
 4. [Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
 ## 回顾思路 ##
@@ -29,9 +32,13 @@
 - Two Sum III - Data structure design找到了题目，可以直接用map、set这些做，就是add(n)添加数字,find(m)判断是否存在
 - Two Sum IV - Input is a BST高级了点，输入是一个二叉搜索树，然后判断是否存在两个数字相加等于目前值
 	- 想的是把二叉树遍历一次，所有值存数组就是之前的算法---------[代码链接以及结果](#code6)
-- 考虑3个数字相加,这就是3Sum（**有一点不同的是要找出所有的解而不是一个**）
+- 考虑3个数字相加,这就是3Sum
 	- 第一反应暴力上次循环无脑，结果不用想肯定垃圾，结果超出想象居然超时了---------[代码链接以及结果](#code4)  
 	- 想了一下，这是3个数字求和为0，我们可以先排序（从小到大），依次选一个负数然后找出两个数与他的和为零，我们只需要遍历所有的负数，然后在通过双下标找到另外两个数。发现速度还行，暂时想不出更好的---------[代码链接以及结果](#code5)  
+- 3Sum可能出现给出的和找不到，那就输出最接近他的三个数字和，这就是变成了3Sum Closest---------[代码链接以及结果](#code7) 
+	- 还是先排序，然后找个变量记录差值，最终要差值最小  
+- 3Sum我们现在找出所有比目标值小的，这就是3Sum Smaller，时间要求是O(n*n)，我们可以参考3Sum Closest和3Sum，先排序，在遍历，不过有个技巧我们在利用双指针遍历的时候，如果三者的和小于目标值，这两个指针之间的都满足要求不再加一而是加他们的差值。
+- 解决了三个数字求和后，我们尝试4个数字求和（4Sum），理论上我们四次循环一定能找到，但是时间上不满足我们的要求。我们可以参考3Sum，在外面添加一层循环
 ### 代码 ###
 <span id="code1">2Sum 暴力法</span>
 
@@ -192,5 +199,35 @@
 		return std::vector<std::vector<int >>(resu.begin(), resu.end());
 	}
 ![](https://i.imgur.com/vv1iwzR.png)
+
+<span id="code7">3Sum Closest</span>
+
+    class Solution {
+	public:
+    	int threeSumClosest(vector<int>& nums, int target) {
+        	std::sort(nums.begin(), nums.end());
+			int result = nums[0] + nums[1] + nums[2];
+			int diff = target-result;
+			for (int i = 0; i < nums.size(); i++)
+			{
+				int start = i + 1;
+				int end = nums.size() - 1;
+				while (start < end) {
+					int sum = nums[i] + nums[start] + nums[end];
+					if (std::abs(sum - target) < diff)
+					{
+						diff = std::abs(sum - target);
+						result = sum;
+					}
+					if (sum < target)
+						start++;
+					else
+						end--;
+				}
+			}
+		return result;
+    	}
+	};		
+![](https://i.imgur.com/ZIbrKil.png)
 ### 分析Two Sum ###
 除了bst以外，都是通过hash表来获得最快的处理，而bst中我采用递归遍历，算法过程和普通的类似，但是最终的出来的时间会比先遍历所有节点，在来查找满足要求的慢，原因个人觉得是由于递归的栈处理时间导致。
