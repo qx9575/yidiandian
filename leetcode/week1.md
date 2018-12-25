@@ -38,7 +38,7 @@
 - 3Sum可能出现给出的和找不到，那就输出最接近他的三个数字和，这就是变成了3Sum Closest---------[代码链接以及结果](#code7) 
 	- 还是先排序，然后找个变量记录差值，最终要差值最小  
 - 3Sum我们现在找出所有比目标值小的，这就是3Sum Smaller，时间要求是O(n*n)，我们可以参考3Sum Closest和3Sum，先排序，在遍历，不过有个技巧我们在利用双指针遍历的时候，如果三者的和小于目标值，这两个指针之间的都满足要求不再加一而是加他们的差值。
-- 解决了三个数字求和后，我们尝试4个数字求和（4Sum），理论上我们四次循环一定能找到，但是时间上不满足我们的要求。我们可以参考3Sum，在外面添加一层循环
+- 解决了三个数字求和后，我们尝试4个数字求和（4Sum），理论上我们四次循环一定能找到，但是时间上不满足我们的要求。我们可以参考3Sum，在外面添加一层循环---------[代码链接以及结果](#code8) 
 ### 代码 ###
 <span id="code1">2Sum 暴力法</span>
 
@@ -229,5 +229,44 @@
     	}
 	};		
 ![](https://i.imgur.com/ZIbrKil.png)
+
+<span id="code8">4Sum</span>
+
+     vector<vector<int>> fourSum(vector<int> &nums, int target)
+    {
+        std::set<std::vector<int>> resu;
+        std::sort(nums.begin(), nums.end());
+        if (nums.size() < 4 || nums[0] + nums[1] + nums[2] + nums[3] > target)
+            return {};
+        for (int ii = 0; ii < nums.size() - 3; ii++)
+        {
+            for (int i = ii + 1; i < nums.size() - 2; i++)
+            {
+                int start = i + 1;
+                int end = nums.size() - 1;
+                while (start < end)
+                {
+                    if ((nums[i] + nums[start] + nums[end] + nums[ii]) == target)
+                    {
+                        resu.insert({nums[ii], nums[i], nums[start], nums[end]});
+                        while (start < end && nums[start] == nums[start + 1])
+                            start++;
+                        while (i < nums.size() - 2 && nums[i] == nums[i + 1])
+                            i++;
+                        while (start < end && nums[end] == nums[end - 1])
+                            end--;
+                        start++;
+                        end--;
+                    }
+                    else if ((nums[i] + nums[ii] + nums[start] + nums[end]) > target)
+                        end--;
+                    else
+                        start++;
+                }
+            }
+        }
+        return std::vector<std::vector<int>>(resu.begin(), resu.end());
+    }
+![](https://i.imgur.com/NzUvyLJ.png)
 ### 分析Two Sum ###
-除了bst以外，都是通过hash表来获得最快的处理，而bst中我采用递归遍历，算法过程和普通的类似，但是最终的出来的时间会比先遍历所有节点，在来查找满足要求的慢，原因个人觉得是由于递归的栈处理时间导致。
+除了bst以外，都是通过hash表来获得最快的处理，而bst中我采用递归遍历，算法过程和普通的类似，但是最终的出来的时间会比先遍历所有节点，在来查找满足要求的慢，原因个人觉得是由于递归的栈处理时间导致。同时在多个数字相加求和的都是采用先排序后两个指针同时移动来加快遍历。
