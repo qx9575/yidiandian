@@ -60,6 +60,7 @@
             }
         };
 ![](https://i.imgur.com/Pn6a497.png)
+
 <span id="code2">2Sum hashmap-twopass</span>
 
      class Solution {
@@ -100,6 +101,7 @@
             }
         };
 ![](https://i.imgur.com/3t2DdOD.png)
+
 <span id="code6">Two Sum IV - Input is a BST</span> 
 		
 	  class Solution {
