@@ -39,6 +39,7 @@
 	- 还是先排序，然后找个变量记录差值，最终要差值最小  
 - 3Sum我们现在找出所有比目标值小的，这就是3Sum Smaller，时间要求是O(n*n)，我们可以参考3Sum Closest和3Sum，先排序，在遍历，不过有个技巧我们在利用双指针遍历的时候，如果三者的和小于目标值，这两个指针之间的都满足要求不再加一而是加他们的差值。
 - 解决了三个数字求和后，我们尝试4个数字求和（4Sum），理论上我们四次循环一定能找到，但是时间上不满足我们的要求。我们可以参考3Sum，在外面添加一层循环---------[代码链接以及结果](#code8) 
+- 如果不限定相加元素的个数，就是类似Subarray Sum Equals K，由于是连续子串求和，和图像里面积分图很类似，所以先计算从0-n的所有元素和放在n位置，任意两个区间n-m之间子串的和就是sum(m)-sum(n-1),这里实现分别实现了最简单的两次遍历和参考2sum的遍历，**要考虑等于相减为零的情况a[0]++**---------[代码链接以及结果](#code9) 
 ### 代码 ###
 <span id="code1">2Sum 暴力法</span>
 
@@ -270,5 +271,45 @@
         return std::vector<std::vector<int>>(resu.begin(), resu.end());
     }
 ![](https://i.imgur.com/NzUvyLJ.png)
+
+<span id="code9">Subarray Sum Equals K</span>
+
+     int subarraySum(vector<int>& nums, int k) {
+        int sum = 0;
+	    int count = 0;
+	    for (int i = 0; i < nums.size(); i++)
+	    {
+		    sum += nums[i];
+		    nums[i] = sum;
+		    if (nums[i] == k)
+			    count++;
+	    }
+	    for (int i = 1; i < nums.size(); i++)
+	    {
+		    for (int j = i; j < nums.size(); j++)
+		    {
+			    if (nums[j] - nums[i-1] == k)
+				    count++;
+		    }
+	    }
+	    return count;
+    }
+![](https://i.imgur.com/cR2xoNG.png)
+
+    int subarraySum1(std::vector<int>& nums, int k) {
+		int sum = 0;
+		int count = 0;
+		std::map<int, int> sumMap;
+		sumMap[0]++;
+		for (int i = 0; i < nums.size(); i++)
+		{
+			sum += nums[i];
+			if(sumMap.find(sum - k)!=sumMap.end())
+				count += sumMap[sum - k];
+			sumMap[sum]++;
+		}
+		return count;
+	}
+![](https://i.imgur.com/3QVTBsh.png)
 ### 分析Two Sum ###
 除了bst以外，都是通过hash表来获得最快的处理，而bst中我采用递归遍历，算法过程和普通的类似，但是最终的出来的时间会比先遍历所有节点，在来查找满足要求的慢，原因个人觉得是由于递归的栈处理时间导致。同时在多个数字相加求和的都是采用先排序后两个指针同时移动来加快遍历。
