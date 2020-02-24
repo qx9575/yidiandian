@@ -24,6 +24,7 @@
     - 看了效果，发现内存使用过多，怀疑递归深度过多导致，写了bfs非递归方式----------[代码链接以及结果](#code4) 
     - 在看了讨论区后，换了一种更简单的写法，上面使用两个变量记录当前层和下一层的节点数，可以直接记录一个队列长度代替，可读性个人觉得更强----------[代码链接以及结果](#code5) 
 - 二叉树的最大深度刚好和最小深度相反，一个左右取最小一个左右取最大，同时非递归算法也和最小深度类似----------[代码链接以及结果](#code6)
+- 对称二叉树的递归就判断每个节点的子节点是否对称，非递归算法最开始手动计算每层节点开始比较的位置，后面改用一个队列和堆栈存----------[代码链接以及结果](#code7)
 
 ### 大佬优秀代码 ###
 - 最大深度，不好理解，没事常看看
@@ -235,7 +236,7 @@
 		执行用时 :4 ms, 在所有 cpp 提交中击败了99.82%的用户
 		内存消耗 :19.5 MB, 在所有 cpp 提交中击败了80.71%的用户
 
-<span id="code6">3Sum 暴力法</span>  
+<span id="code6">最大深度</span>  
 
 		int maxDepthFirst(TreeNode* root) {
         	int ld=0;
@@ -283,295 +284,119 @@
 		执行用时 :8 ms, 在所有 cpp 提交中击败了92.98%的用户
 		内存消耗 :19.3 MB, 在所有 cpp 提交中击败了60.40%的用户
 
-<span id="code5">3Sum 只遍历负数</span>  
-    
-    std::vector<std::vector<int>> threeSum1(std::vector<int>& nums) {
-		std::set<std::vector<int >> resu;
-		std::sort(nums.begin(), nums.end());
-		if (nums.size() < 3 || nums[0] >= 0 || nums[nums.size() - 1] <= 0)
-			return {  };
-		for (int i = 0; i < nums.size(); i++)
-		{
-			if (nums[i] > 0)
-				break;
-			int start = i + 1;
-			int end = nums.size() - 1;
-			while (start < end) {
-				if ((nums[i] + nums[start] + nums[end]) == 0)
-				{
-					resu.insert({ nums[i] , nums[start] , nums[end] });
-					while (start < end&&nums[start] == nums[start + 1])
-						start++;
-					while (start < end&&nums[end] == nums[end - 1])
-						end--;
-					start++;
-					end--;
-				}
-				else if ((nums[i] + nums[start] + nums[end]) > 0)
-					end--;
-				else start++;
-			}
-		}
-		return std::vector<std::vector<int >>(resu.begin(), resu.end());
-	}
-![](https://i.imgur.com/vv1iwzR.png)
 
-<span id="code7">3Sum Closest</span>
 
+<span id="code7">对称二叉树</span>
+
+	********************递归版本*********************
     class Solution {
 	public:
-    	int threeSumClosest(vector<int>& nums, int target) {
-        	std::sort(nums.begin(), nums.end());
-			int result = nums[0] + nums[1] + nums[2];
-			int diff = target-result;
-			for (int i = 0; i < nums.size(); i++)
-			{
-				int start = i + 1;
-				int end = nums.size() - 1;
-				while (start < end) {
-					int sum = nums[i] + nums[start] + nums[end];
-					if (std::abs(sum - target) < diff)
-					{
-						diff = std::abs(sum - target);
-						result = sum;
-					}
-					if (sum < target)
-						start++;
-					else
-						end--;
-				}
-			}
-		return result;
+		bool judgeSame(TreeNode* l, TreeNode* r){
+        	if(l == NULL && r == NULL) return true;
+        	if(l == NULL || r == NULL) return false;
+        	if(l -> val != r -> val) return false;
+        	return judgeSame(l -> right, r -> left) & judge(l -> left, r -> right);
+    	}
+    	bool isSymmetric(TreeNode* root) {
+        	if(root == NULL) return true;
+        		return judgeSame(root -> left, root -> right);
     	}
 	};		
-![](https://i.imgur.com/ZIbrKil.png)
-
-<span id="code8">4Sum</span>
-
-     vector<vector<int>> fourSum(vector<int> &nums, int target)
-    {
-        std::set<std::vector<int>> resu;
-        std::sort(nums.begin(), nums.end());
-        if (nums.size() < 4 || nums[0] + nums[1] + nums[2] + nums[3] > target)
-            return {};
-        for (int ii = 0; ii < nums.size() - 3; ii++)
-        {
-            for (int i = ii + 1; i < nums.size() - 2; i++)
-            {
-                int start = i + 1;
-                int end = nums.size() - 1;
-                while (start < end)
-                {
-                    if ((nums[i] + nums[start] + nums[end] + nums[ii]) == target)
-                    {
-                        resu.insert({nums[ii], nums[i], nums[start], nums[end]});
-                        while (start < end && nums[start] == nums[start + 1])
-                            start++;
-                        while (i < nums.size() - 2 && nums[i] == nums[i + 1])
-                            i++;
-                        while (start < end && nums[end] == nums[end - 1])
-                            end--;
-                        start++;
-                        end--;
-                    }
-                    else if ((nums[i] + nums[ii] + nums[start] + nums[end]) > target)
-                        end--;
-                    else
-                        start++;
-                }
-            }
-        }
-        return std::vector<std::vector<int>>(resu.begin(), resu.end());
-    }
-![](https://i.imgur.com/NzUvyLJ.png)
-
-<span id="code9">Subarray Sum Equals K</span>
-
-     int subarraySum(vector<int>& nums, int k) {
-        int sum = 0;
-	    int count = 0;
-	    for (int i = 0; i < nums.size(); i++)
-	    {
-		    sum += nums[i];
-		    nums[i] = sum;
-		    if (nums[i] == k)
-			    count++;
-	    }
-	    for (int i = 1; i < nums.size(); i++)
-	    {
-		    for (int j = i; j < nums.size(); j++)
-		    {
-			    if (nums[j] - nums[i-1] == k)
-				    count++;
-		    }
-	    }
-	    return count;
-    }
-![](https://i.imgur.com/cR2xoNG.png)
-
-
-	class Solution {
+	******************非递归版本*********************
+	**********该方法手动计算对应节点位置很麻烦**********
+	**********老出错，后面采用队列栈来记录位置**********
+	**********不用计算对应节点位置********************
+    class Solution {
 	public:
-		bool is_construct_same_v1_1(TreeNode* p, TreeNode* q) {
-			return ((p->left && q->right) || (!p->left && !q->right)) && ((p->right && q->left) || (!p->right && !q->left)) && (p->val == q->val);
-		}
-	// 计算插入位置太复杂,sIndex的依次往后存(先进去的在前面),eIndex的往前存(先进去的在后面)
-	// 前面队列,后面栈
-	// 没有考虑效率,主要考虑易读性和安全,存在插入非法位置
-	bool isSymmetric_v1_1(TreeNode* root) {
-		vector<TreeNode*> nodeList;
-		if (!root)
-			return true;
-		if (root->left && root->right && (root->left->val == root->right->val))
-		{
-			nodeList.push_back(root->left);
-			nodeList.push_back(root->right);
-		}
-		else if (!root->left && !root->right) {
-			return true;
-		}	
-	else
-		return false;
-	while (!nodeList.empty()) {
-		queue<TreeNode*> forward_queue;
-		stack<TreeNode*> end_stack;
-		for (int sIndex = 0, eIndnx = (nodeList.size() - 1); sIndex < eIndnx;) {
-			bool is_same = false;
-			//结构一样
-			if (nodeList[sIndex] && nodeList[eIndnx]) {
-				is_same = is_construct_same_v1_1(nodeList[sIndex], nodeList[eIndnx]);
-			}
-			if (!is_same)
-				return false;
-			if (nodeList[sIndex]->left)
-				forward_queue.emplace(nodeList[sIndex]->left);
-
-			if (nodeList[sIndex]->right)
-				forward_queue.emplace(nodeList[sIndex]->right);
-            if (nodeList[eIndnx]->right) {
-				end_stack.emplace(nodeList[eIndnx]->right);
-			}
-			if (nodeList[eIndnx]->left) {
-				end_stack.emplace(nodeList[eIndnx]->left);
-			}
-			sIndex++;
-			eIndnx--;
-		}
-		nodeList.clear();
-		while (!forward_queue.empty()) {
-			nodeList.emplace_back(std::move(forward_queue.front()));
-			forward_queue.pop();
-		}
-		while (!end_stack.empty()) {
-			nodeList.emplace_back(std::move(end_stack.top()));
-			end_stack.pop();
-		}
-		}
-		return true;
-		}
-        bool isSymmetric(TreeNode* root) {
-        deque<TreeNode*> d;
-        d.push_back(root);
-        d.push_back(root);
-        
-        while( !d.empty() ) {
-            TreeNode* t1 = d.front();
-            d.pop_front();
-            TreeNode* t2 = d.front();
-            d.pop_front();
-            
-            if( t1 == nullptr && t2 == nullptr) continue; //注意！这里是continue，不是直接递归的时候那样可以直接返回true了！
-            if( t1 == nullptr || t2 == nullptr) return false;
-            
-            if(t1->val != t2->val) return false;
-            
-            d.push_back(t1->right);
-            d.push_back(t2->left);
-            d.push_back(t1->left);
-            d.push_back(t2->right);
-        }
-     
-        return true;
-    }
-
-
-   
-    bool judgeSame_v2(TreeNode* ln,TreeNode* rn){
-    if(!ln&&!rn)
-        return true;
-    else if(ln&&rn&&ln->val==rn->val)
-        return judgeSame_v2(ln->left,rn->right)&&judgeSame_v2(ln->right,rn->left); 
-    else  
-        return false;
-    }
-
-    bool isSymmetric_v2(TreeNode* root) {
-    if(!root)
-        return true;
-    return judgeSame_v2(root->left,root->right);
-     }
-    bool is_construct_same_v1(TreeNode* p, TreeNode* q) {
-	return ((p->left && q->right) || (!p->left && !q->right)) && ((p->right && q->left) || (!p->right && !q->left)) && (p->val == q->val);
-    }
-    bool isSymmetric_v1(TreeNode* root) {
-	vector<TreeNode*> nodeList;
-	if (!root)
-		return true;
-	nodeList.push_back(root);
-	int i = 1;
-	while (!nodeList.empty()) {
-		vector<TreeNode*> vec_temp;
-		if (nodeList.size() == 1) {
-			if (nodeList[0]->left && nodeList[0]->right && (nodeList[0]->left->val == nodeList[0]->right->val))
-			{
-				vec_temp.push_back(nodeList[0]->left);
-				vec_temp.push_back(nodeList[0]->right);
-			}
-			else if (!nodeList[0]->left && !nodeList[0]->right) {
+		bool isSymmetric_v1(TreeNode* root) {
+			vector<TreeNode*> nodeList;
+			if (!root)
 				return true;
-			}
-			else
-				return false;
-		}
-		else
-		{
-			int forward_offset = 0;
-			int end_offset = 0;
-			for (int sIndex = 0, eIndnx = (nodeList.size() - 1); sIndex < eIndnx;) {
-				bool is_same = false;
-                int gap=0;
-				//结构一样
-				if (nodeList[sIndex] && nodeList[eIndnx]) {
-					is_same = is_construct_same_v1(nodeList[sIndex], nodeList[eIndnx]);
+			nodeList.push_back(root);
+			int i = 1;
+			while (!nodeList.empty()) {
+				vector<TreeNode*> vec_temp;
+				if (nodeList.size() == 1) {
+					if (nodeList[0]->left && nodeList[0]->right && (nodeList[0]->left->val == nodeList[0]->right->val){
+						vec_temp.push_back(nodeList[0]->left);
+						vec_temp.push_back(nodeList[0]->right);
+					}
+					else if (!nodeList[0]->left && !nodeList[0]->right) {
+						return true;
+					}
+					else
+						return false;
 				}
-				if (!is_same)
-					return false;
-				if (nodeList[sIndex]->left)
-					vec_temp.insert(vec_temp.begin() + (forward_offset++), nodeList[sIndex]->left);
+				else{
+					int forward_offset = 0;
+					int end_offset = 0;
+					for (int sIndex = 0, eIndnx = (nodeList.size() - 1); sIndex < eIndnx;) {
+						bool is_same = false;
+               			int gap=0;
+						//结构一样
+						if (nodeList[sIndex] && nodeList[eIndnx]) {
+						is_same = is_construct_same_v1(nodeList[sIndex], nodeList[eIndnx]);
+						}
+						if (!is_same)
+							return false;
+						if (nodeList[sIndex]->left)
+							vec_temp.insert(vec_temp.begin() + (forward_offset++), nodeList[sIndex]->left);
 		
-				if (nodeList[sIndex]->right)
-					vec_temp.insert(vec_temp.begin() + (forward_offset++) , nodeList[sIndex]->right);
+						if (nodeList[sIndex]->right)
+							vec_temp.insert(vec_temp.begin() + (forward_offset++) , nodeList[sIndex]->right);
 		
-				if (nodeList[eIndnx]->left){
-                    gap++;
-                    vec_temp.insert(vec_temp.begin() + vec_temp.size()-end_offset , nodeList[eIndnx]->left);
-                }
+						if (nodeList[eIndnx]->left){
+                   	 		gap++;
+                    		vec_temp.insert(vec_temp.begin() + vec_temp.size()-end_offset , nodeList[eIndnx]->left);
+                		}
 					
-				if (nodeList[eIndnx]->right){
-                    gap++;
-                    vec_temp.insert(vec_temp.begin() + vec_temp.size() - end_offset, nodeList[eIndnx]->right);
-                }
+						if (nodeList[eIndnx]->right){
+                    		gap++;
+                    		vec_temp.insert(vec_temp.begin() + vec_temp.size() - end_offset, nodeList[eIndnx]->right);
+                		}
 					
-                end_offset += gap;
-				sIndex++;
-				eIndnx--;
+                		end_offset += gap;
+						sIndex++;
+						eIndnx--;
+					}
+				}
+				nodeList = vec_temp;
 			}
+			return true;
 		}
-		nodeList = vec_temp;
-	}
-	return true;
-}
-};
-![](https://i.imgur.com/3QVTBsh.png)
+	};		
+	******************非递归版本-最终优化*************
+	**********从前往后和从后往前找节点对应完全可********
+	*******以在入队顺序那里处理，代码简洁很多***********
+    class Solution {
+	public:
+		bool isSymmetric(TreeNode* root) {
+        	deque<TreeNode*> d;
+        	d.push_back(root);
+        	d.push_back(root);
+        
+        	while( !d.empty() ) {
+            	TreeNode* t1 = d.front();
+            	d.pop_front();
+            	TreeNode* t2 = d.front();
+            	d.pop_front();
+            
+            	if( t1 == nullptr && t2 == nullptr) continue; //注意！这里是continue，不是直接递归的时候那样可以直接返回true了！
+            	if( t1 == nullptr || t2 == nullptr) return false;
+            
+            	if(t1->val != t2->val) return false;
+            
+            	d.push_back(t1->right);
+            	d.push_back(t2->left);
+            	d.push_back(t1->left);
+            	d.push_back(t2->right);
+        	}
+     
+        	return true;
+    	}   
+	};		
+	
+
+
 ### 分析Two Sum ###
 除了bst以外，都是通过hash表来获得最快的处理，而bst中我采用递归遍历，算法过程和普通的类似，但是最终的出来的时间会比先遍历所有节点，在来查找满足要求的慢，原因个人觉得是由于递归的栈处理时间导致。同时在多个数字相加求和的都是采用先排序后两个指针同时移动来加快遍历。
